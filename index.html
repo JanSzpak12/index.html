@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10101d">
+  <meta name="description" content="Tajna misja. Trzy pytania. Jedna ważna decyzja.">
+  <title>Operacja: Randka 🎮</title>
+
+  <style>
+    :root {
+      --background: #10101d;
+      --panel: #1b1b30;
+      --panel-light: #272641;
+      --purple: #b49aff;
+      --pink: #ff82c8;
+      --green: #8ef0b2;
+      --text: #f8f6ff;
+      --muted: #b7b4cc;
+      --border: #3d3a5c;
+      --danger: #ff9ba9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% 0%, #342353 0%, transparent 55%),
+        var(--background);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--green);
+      outline-offset: 4px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 540px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    .online {
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .card {
+      padding: 28px;
+      overflow: hidden;
+      background: rgba(27, 27, 48, 0.97);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .icon {
+      margin-bottom: 10px;
+      font-size: 42px;
+    }
+
+    .eyebrow {
+      color: var(--pink);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 10px 0 14px;
+      font-size: clamp(30px, 8vw, 42px);
+      line-height: 1.08;
+    }
+
+    h2 {
+      margin: 12px 0 18px;
+      font-size: clamp(22px, 6vw, 29px);
+      line-height: 1.25;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .stats {
+      display: grid;
+      gap: 8px;
+      margin: 22px 0;
+      padding: 16px;
+      background: #151527;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      font-size: 13px;
+    }
+
+    .stats strong {
+      color: var(--purple);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 9px;
+      overflow: hidden;
+      background: #34314d;
+      border-radius: 20px;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      border-radius: inherit;
+      transition: width 220ms ease;
+    }
+
+    .answers {
+      display: grid;
+      gap: 11px;
+      margin-top: 22px;
+    }
+
+    .answer {
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 16px;
+      color: var(--text);
+      text-align: left;
+      background: var(--panel-light);
+      border: 1px solid #45415f;
+      border-radius: 12px;
+      transition: background 150ms ease, border-color 150ms ease;
+    }
+
+    .answer:hover {
+      border-color: var(--purple);
+      background: #32304f;
+    }
+
+    .answer.selected {
+      border-color: var(--green);
+      background: #1d3a34;
+    }
+
+    .answer::before {
+      content: "▢";
+      margin-right: 12px;
+      color: var(--purple);
+    }
+
+    .answer.selected::before {
+      content: "▣";
+      color: var(--green);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 49px;
+      padding: 13px 18px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      font-weight: 850;
+    }
+
+    .primary {
+      flex: 1;
+      color: #171326;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+    }
+
+    .primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      color: var(--text);
+      background: transparent;
+      border-color: var(--border);
+    }
+
+    .small-note {
+      margin-top: 20px;
+      font-size: 12px;
+    }
+
+    .exit-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      text-underline-offset: 4px;
+    }
+
+    .exit-link:hover {
+      color: var(--text);
+    }
+
+    .final-box {
+      margin-top: 22px;
+      padding: 20px 16px;
+      text-align: center;
+      background: #24213d;
+      border: 1px solid #51476e;
+      border-radius: 16px;
+    }
+
+    .final-box h2 {
+      margin-top: 0;
+    }
+
+    .final-actions {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      min-height: 70px;
+      margin-top: 20px;
+    }
+
+    .yes-button,
+    .no-button {
+      min-width: 125px;
+      min-height: 49px;
+      padding: 13px 22px;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+
+    .yes-button {
+      color: #102319;
+      background: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .yes-button:hover {
+      filter: brightness(1.07);
+    }
+
+    .no-button {
+      color: var(--text);
+      background: #38283f;
+      border: 1px solid #66506d;
+      touch-action: manipulation;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 18px;
+      background: #17352d;
+      border: 1px solid #3c8068;
+      border-radius: 14px;
+    }
+
+    .result h3 {
+      margin-top: 0;
+      color: var(--green);
+    }
+
+    .result p {
+      color: #e0f7eb;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      margin-top: 14px;
+      color: #88849f;
+      font-size: 10px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 12px;
+        align-items: start;
+      }
+
+      .card {
+        padding: 22px 17px;
+      }
+
+      .topbar {
+        font-size: 9px;
+        letter-spacing: 1px;
+      }
+
+      .actions > button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="topbar">
+      <span>🎮 Projekt: Randka</span>
+      <span class="online">● SYSTEM ONLINE</span>
+    </header>
+
+    <div class="card">
+
+      <!-- EKRAN STARTOWY -->
+      <section id="startScreen">
+        <div class="icon" aria-hidden="true">🕹️</div>
+        <div class="eyebrow">Tajna misja • Poziom 1</div>
+        <h1>Operacja:<br>Randka</h1>
+
+        <p>
+          Witaj, graczu. Przed Tobą trzy krótkie pytania.
+          Po ich ukończeniu odblokujesz finałową misję.
+        </p>
+
+        <div class="stats">
+          <div>🎯 <strong>Cel:</strong> ukończyć misję</div>
+          <div>🧠 <strong>Poziom trudności:</strong> nieznany</div>
+          <div>🏆 <strong>Nagroda:</strong> do ustalenia</div>
+        </div>
+
+        <button class="primary" id="startButton">
+          ROZPOCZNIJ MISJĘ →
+        </button>
+
+        <p class="small-note">
+          Możesz zakończyć w dowolnym momencie, zamykając kartę
+          lub korzystając z przycisku wyjścia.
+        </p>
+      </section>
+
+      <!-- EKRANY PYTAŃ -->
+      <section id="quizScreen" hidden>
+        <div class="eyebrow" id="questionLabel">Misja • Pytanie 1</div>
+
+        <div class="progress-header">
+          <span>POSTĘP MISJI</span>
+          <span id="progressNumber">0/3</span>
+        </div>
+
+        <div
+          class="progress-track"
+          id="progressTrack"
+          role="progressbar"
+          aria-label="Postęp misji"
+          aria-valuemin="0"
+          aria-valuemax="3"
+          aria-valuenow="0"
+        >
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <h2 id="questionText"></h2>
+        <div class="answers" id="answers"></div>
+
+        <div class="actions">
+          <button class="primary" id="nextButton" disabled>
+            ZATWIERDŹ ODPOWIEDŹ →
+          </button>
+          <button class="secondary" id="backButton">
+            ← WRÓĆ
+          </button>
+        </div>
+
+        <a class="exit-link" href="about:blank">Wyjdź z misji</a>
+      </section>
+
+      <!-- EKRAN FINAŁOWY -->
+      <section id="finalScreen" hidden>
+        <div class="icon" aria-hidden="true">🏆</div>
+        <div class="eyebrow">Misja finałowa</div>
+        <h1>Dotarłaś do końca!</h1>
+
+        <p>
+          Wszystkie pytania zaliczone. System wykrył podwyższone
+          stężenie tajemniczości. Uruchamiam ostatni etap…
+        </p>
+
+        <div class="progress-header">
+          <span>POSTĘP MISJI</span>
+          <span>3/3</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 100%"></div>
+        </div>
+
+        <div class="final-box">
+          <h2>Czy pójdziesz ze mną na randkę?</h2>
+          <p>Decyzja należy do Ciebie. System oczekuje na odpowiedź.</p>
+
+          <div class="final-actions" id="finalActions">
+            <button class="yes-button" id="yesButton">TAK 💚</button>
+            <button class="no-button" id="noButton">NIE 🙃</button>
+          </div>
+        </div>
+
+        <div class="result" id="yesResult" hidden>
+          <h3>🎉 MISJA ZAAKCEPTOWANA!</h3>
+          <p>Odblokowano nowy quest: wspólna randka.</p>
+          <p><strong>Plan misji:</strong></p>
+          <p id="datePlanText"></p>
+        </div>
+
+        <p class="small-note">
+          PS. Przycisk „Nie” ma własne plany. Stronę możesz zamknąć
+          w każdej chwili.
+        </p>
+
+        <a class="exit-link" href="about:blank">Wyjdź z misji</a>
+      </section>
+    </div>
+
+    <footer class="footer">
+      OPERACJA: RANDKA • BUILD 1.0 • PLAYER 1 READY
+    </footer>
+  </main>
+
+  <script>
+    /*
+     * EDYTUJ TREŚĆ TUTAJ
+     *
+     * Zmieniaj teksty w questions oraz datePlan.
+     * Pozostały kod odpowiada za działanie strony.
+     */
+
+    const questions = [
+      {
+        text: "Czy jesteś kobietą?",
+        options: [
+          "Tak",
+          "Nie",
+          "Wolę nie ujawniać"
+        ]
+      },
+      {
+        text: "Czy masz chłopaka?",
+        options: [
+          "Tak",
+          "Nie"
+        ]
+      },
+      {
+        text: "Czy chcesz mieć chłopaka?",
+        options: [
+          "Tak",
+          "Nie"
+        ]
+      }
+    ];
+
+    // UZUPEŁNIJ własnym planem randki:
+    const datePlan = "Aby poznać plan, skontaktuj się z użytkownikiem Jan";
+
+    /*
+     * MECHANIKA STRONY
+     */
+
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const finalScreen = document.getElementById("finalScreen");
+
+    const startButton = document.getElementById("startButton");
+    const nextButton = document.getElementById("nextButton");
+    const backButton = document.getElementById("backButton");
+
+    const questionLabel = document.getElementById("questionLabel");
+    const questionText = document.getElementById("questionText");
+    const answersContainer = document.getElementById("answers");
+
+    const progressFill = document.getElementById("progressFill");
+    const progressNumber = document.getElementById("progressNumber");
+    const progressTrack = document.getElementById("progressTrack");
+
+    const yesButton = document.getElementById("yesButton");
+    const noButton = document.getElementById("noButton");
+    const finalActions = document.getElementById("finalActions");
+
+    const yesResult = document.getElementById("yesResult");
+    const datePlanText = document.getElementById("datePlanText");
+
+    let currentQuestion = 0;
+    let selectedAnswers = Array(questions.length).fill(null);
+
+    function showScreen(screenToShow) {
+      startScreen.hidden = screenToShow !== startScreen;
+      quizScreen.hidden = screenToShow !== quizScreen;
+      finalScreen.hidden = screenToShow !== finalScreen;
+    }
+
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+
+      questionLabel.textContent =
+        `Misja • Pytanie ${currentQuestion + 1} z ${questions.length}`;
+
+      questionText.textContent = question.text;
+      answersContainer.replaceChildren();
+
+      question.options.forEach((option, index) => {
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "answer";
+        button.textContent = option;
+        button.setAttribute("aria-pressed", "false");
+
+        if (selectedAnswers[currentQuestion] === index) {
+          button.classList.add("selected");
+          button.setAttribute("aria-pressed", "true");
+        }
+
+        button.addEventListener("click", () => {
+          selectedAnswers[currentQuestion] = index;
+
+          answersContainer.querySelectorAll(".answer").forEach((item) => {
+            item.classList.remove("selected");
+            item.setAttribute("aria-pressed", "false");
+          });
+
+          button.classList.add("selected");
+          button.setAttribute("aria-pressed", "true");
+          nextButton.disabled = false;
+        });
+
+        answersContainer.appendChild(button);
+      });
+
+      nextButton.disabled = selectedAnswers[currentQuestion] === null;
+      nextButton.textContent =
+        currentQuestion === questions.length - 1
+          ? "PRZEJDŹ DO FINAŁU →"
+          : "ZATWIERDŹ ODPOWIEDŹ →";
+
+      backButton.textContent =
+        currentQuestion === 0 ? "← MENU GŁÓWNE" : "← WRÓĆ";
+
+      const progress = (currentQuestion / questions.length) * 100;
+
+      progressFill.style.width = `${progress}%`;
+      progressNumber.textContent =
+        `${currentQuestion}/${questions.length}`;
+
+      progressTrack.setAttribute("aria-valuenow", currentQuestion);
+    }
+
+    startButton.addEventListener("click", () => {
+      currentQuestion = 0;
+      showScreen(quizScreen);
+      renderQuestion();
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (selectedAnswers[currentQuestion] === null) return;
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showScreen(finalScreen);
+      }
+    });
+
+    backButton.addEventListener("click", () => {
+      if (currentQuestion === 0) {
+        showScreen(startScreen);
+      } else {
+        currentQuestion--;
+        renderQuestion();
+      }
+    });
+
+    // Odpowiedź "Tak" działa normalnie.
+    yesButton.addEventListener("click", () => {
+      datePlanText.textContent = datePlan;
+      yesResult.hidden = false;
+      yesButton.textContent = "TAK! 🎉";
+      noButton.hidden = true;
+    });
+
+    /*
+     * Przycisk "Nie" próbuje uciec.
+     * Na komputerze reaguje na zbliżenie kursora.
+     * Na ekranie dotykowym reaguje na próbę dotknięcia.
+     */
+
+    function moveNoButton() {
+      const areaRect = finalActions.getBoundingClientRect();
+      const buttonRect = noButton.getBoundingClientRect();
+
+      const maxX = Math.max(0, (areaRect.width - buttonRect.width) / 2);
+      const offsetX = (Math.random() * 2 - 1) * maxX;
+      const offsetY = (Math.random() * 2 - 1) * 18;
+
+      noButton.style.position = "relative";
+      noButton.style.left = `${offsetX}px`;
+      noButton.style.top = `${offsetY}px`;
+    }
+
+    noButton.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse") {
+        moveNoButton();
+      }
+    });
+
+    noButton.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      moveNoButton();
+    });
+  </script>
+</body>
+</html>
